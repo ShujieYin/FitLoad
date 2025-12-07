@@ -1,0 +1,19 @@
+{
+  "bsonType": "object",
+  "required": ["user_id", "date", "time of day", "weekday", "rpe", "duration", "load"],
+  "properties": {
+    "user_id": { "bsonType": "string" },
+    "date": { "bsonType": "string", "description": "yyyy-mm-dd" },
+    "time of day":{
+      "bsonType": "string",
+      "enum": ["morning", "afternoon", "night"]
+    },
+    "weekday":{"bsonType": "int" },
+    "category": { "bsonType": "string" },
+    "rpe": { "bsonType": "int" },
+    "duration": { "bsonType": "int" },
+    "load": { "bsonType": "int" },
+    "note": { "bsonType": "string" },
+    "created_at": { "bsonType": "timestamp" }
+  }
+}

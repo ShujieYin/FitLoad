@@ -1,0 +1,50 @@
+{
+  "pages": [
+	  {
+      "path": "pages/calendar/calendar",
+      "style": {
+        "navigationBarTitleText": "Training Calendar"
+      }
+    },
+    {
+      "path": "pages/addRecord/addRecord",
+      "style": {
+        "navigationBarTitleText": "Add Training Record"
+      }
+    },
+    {
+      "path": "pages/editRecord/editRecord",
+      "style": {
+        "navigationBarTitleText": "Edit Training Record"
+      }
+    },
+    {
+      "path": "pages/stats/stats",
+      "style": {
+        "navigationBarTitleText": "Training Statistics"
+      }
+    }
+  ],
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#42b983",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/calendar/calendar",
+        "text": "Calendar"
+      },
+      {
+        "pagePath": "pages/stats/stats",
+        "text": "Statistic"
+      }
+    ]
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "FitLoad",
+    "navigationBarTextStyle": "black"
+  }
+}
