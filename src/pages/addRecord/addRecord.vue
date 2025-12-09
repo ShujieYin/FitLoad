@@ -22,12 +22,16 @@
     </view>
 
     <view class="form-group">
-      <text class="label">Notes</text>
-      <textarea v-model="note" class="textarea" placeholder="Add notes" />
+      <text class="label">HRV (ms)(optional)</text>
+      <input type="number" v-model.number="hrv" min="0" class="input" placeholder="Enter HRV value" />
     </view>
-
     <view class="load-display">
       <text class="load-label">Load: {{ load }} (RPE × Duration)</text>
+    </view>
+
+    <view class="form-group">
+      <text class="label">Notes</text>
+      <textarea v-model="note" class="textarea" placeholder="Add notes" />
     </view>
 
     <button class="submit-btn" @click="submitRecord">Save Record</button>
@@ -44,6 +48,7 @@ export default {
       categoryIndex: 0,
       categories: ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Full Body'],
       note: '',
+      hrv: 0,
       load: 300
     }
   },
@@ -75,6 +80,7 @@ export default {
             date: this.date,
             rpe: this.rpe,
             duration: this.duration,
+            hrv: this.hrv,
             category: this.categories[this.categoryIndex],
             note: this.note
           }

@@ -1,0 +1,12 @@
+// 本文件中的json内容将在云函数【运行】时作为参数传给云函数。
+// 配置教程参考：https://uniapp.dcloud.net.cn/uniCloud/rundebug.html#runparam
+{
+  "rpe": 10,
+  "duration": 5,
+  "category": "back",
+  "note": "用 HBuilderX 本地测试",
+  "date": "2025-11-02",
+  "time of day": "morning",
+  "hrv": 40,
+  "auth": { "uid": "test-user-123" }
+}
