@@ -26,26 +26,23 @@ exports.main = async (event, context) => {
   for (let i = 0; i < 8; i++) {
     weekList.push({ year, yearWeek: week })
     week--
-    if (week === 0) { // 回退到上一年
+    if (week === 0) { 
       year--
       const lastWeekOfPrevYear = getISOWeek(new Date(year, 11, 31)).week
       week = lastWeekOfPrevYear
     }
   }
 
-  console.log("Query weeks:", weekList)
-
   // -------- 查询数据库 --------
   const query = _.or(weekList.map(w => ({ year: w.year, yearWeek: w.yearWeek })))
   const res = await db.collection('training_record')
     .where({
       user_id: userId,
-      ...query ? { $or: query } : {}
+      $or: weekList.map(w => ({ year: w.year, yearWeek: w.yearWeek }))
     })
     .get()
 
   const records = res.data || []
-  console.log("Fetched records:", records.length)
 
   // -------- 按 week 聚合 totalLoad 和 avgRpe --------
   const weeklyMap = {}
@@ -63,18 +60,39 @@ exports.main = async (event, context) => {
   const weeklyStats = Object.values(weeklyMap)
     .sort((a, b) => (a.year - b.year) || (a.week - b.week))
     .map(item => ({
-      year: item.year,
-      week: item.week,
+      // label: `${item.year}-W${item.week}`,
+      label: `CW${item.week}`,
       totalLoad: item.totalLoad,
-      avgRpe: Number((item.totalRpe / item.count).toFixed(2)),
-      key: `${item.year}-W${item.week}`
+      avgRpe: Number((item.totalRpe / item.count).toFixed(2))
     }))
 
-  console.log("Weekly Stats:", weeklyStats)
+  // -------- 返回你想要的格式 --------
+  const categories = weeklyStats.map(i => i.label)
+  const loadData = weeklyStats.map(i => i.totalLoad)
+  const avgRpeData = weeklyStats.map(i => i.avgRpe)
 
   return {
     code: 0,
     msg: "success",
-    data: weeklyStats
+    data: {
+      Column: {
+        categories,
+        series: [
+          {
+            name: "Load",
+            data: loadData
+          }
+        ]
+      },
+      Line: {
+        categories,
+        series: [
+          {
+            name: "avgRPE",
+            data: avgRpeData
+          }
+        ]
+      }
+    }
   }
 }

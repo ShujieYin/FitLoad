@@ -1,0 +1,47 @@
+'use strict';
+
+exports.main = async (event, context) => {
+  const db = uniCloud.database()
+  // const userId = context.auth?.uid || "NO_AUTH_USER"
+  const userId = "demo" //测试用
+
+  const { date } = event   // 期望格式：yyyy-mm-dd
+
+  if (!date) {
+    return {
+      code: 400,
+      msg: "Missing 'date', expected yyyy-mm-dd"
+    }
+  }
+
+  console.log("=== Fetching Records ===")
+  console.log("UserId:", userId)
+  console.log("Date:", date)
+
+  try {
+    const res = await db.collection('training_record')
+      .where({
+        user_id: userId,
+        date: date
+      })
+      .orderBy("time of day", "asc")
+      .get()
+
+    console.log("DB Result:", res.data)
+
+    return {
+      code: 0,
+      msg: "success",
+      data: res.data
+    }
+
+  } catch (error) {
+    console.error("DB Error:", error)
+
+    return {
+      code: 500,
+      msg: "database error",
+      error: error.message
+    }
+  }
+}

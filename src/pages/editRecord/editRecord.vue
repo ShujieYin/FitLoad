@@ -22,7 +22,7 @@
     </view>
 
     <view class="form-group">
-      <text class="label">HRV (ms)</text>
+      <text class="label">HRV (ms)(optional)</text>
       <input type="number" v-model.number="hrv" min="0" class="input" placeholder="Enter HRV value" />
     </view>
 
@@ -32,7 +32,7 @@
     </view>
 
     <view class="load-display">
-      <text class="load-label">Load: {{ load }} (RPE � Duration)</text>
+      <text class="load-label">Load: {{ load }} (RPE x Duration)</text>
     </view>
 
     <button class="submit-btn" @click="submitRecord">Save Changes</button>
@@ -47,7 +47,7 @@ export default {
       rpe: 5,
       duration: 60,
       categoryIndex: 0,
-      categories: ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Full Body'],
+      categories: ['Full Body', 'Upper Body','Lower Body',"Basketball", "Cycling", 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms'],
       note: '',
       hrv: 0,
       load: 300

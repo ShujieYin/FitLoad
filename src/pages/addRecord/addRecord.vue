@@ -5,6 +5,15 @@
     </view>
 
     <view class="form-group">
+      <text class="label">Time of Day</text>
+      <view class="picker-group">
+        <picker mode="selector" :range="timeOfDays" @change="timeOfDayChange">
+          <view class="picker">{{ timeOfDays[timeOfDayIndex] }}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-group">
       <text class="label">RPE (1-10)</text>
       <input type="number" v-model.number="rpe" min="1" max="10" class="input" placeholder="Enter RPE" />
     </view>
@@ -16,9 +25,11 @@
 
     <view class="form-group">
       <text class="label">Training Type</text>
-      <picker mode="selector" :range="categories" @change="categoryChange">
-        <view class="picker">{{ categories[categoryIndex] }}</view>
-      </picker>
+      <view class="picker-group">
+        <picker mode="selector" :range="categories" @change="categoryChange">
+          <view class="picker">{{ categories[categoryIndex] }}</view>
+        </picker>
+      </view>
     </view>
 
     <view class="form-group">
@@ -43,13 +54,15 @@ export default {
   data() {
     return {
       date: '',
-      rpe: 5,
-      duration: 60,
+      rpe: "",
+      duration: "",
       categoryIndex: 0,
-      categories: ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Full Body'],
+      categories: ['Full Body', 'Upper Body','Lower Body',"Basketball", "Cycling", 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms'],
+      timeOfDayIndex:0,
+      timeOfDays: ["morning", "afternoon", "night"],
       note: '',
       hrv: 0,
-      load: 300
+      load: 0
     }
   },
 
@@ -71,6 +84,9 @@ export default {
     categoryChange(e) {
       this.categoryIndex = e.detail.value
     },
+    timeOfDayChange(e) {
+      this.timeOfDayIndex = e.detail.value
+    },
 
     async submitRecord() {
       try {
@@ -82,14 +98,17 @@ export default {
             duration: this.duration,
             hrv: this.hrv,
             category: this.categories[this.categoryIndex],
-            note: this.note
+            "time of day": this.timeOfDays[this.timeOfDayIndex],
+            note: this.note,
           }
         })
         uni.showToast({ title: 'Record saved!', icon: 'success' })
         uni.navigateBack()
       } catch (error) {
         uni.showToast({ title: 'Failed to save', icon: 'error' })
+        console.error("调用失败", e)
       }
+
     }
   },
 
@@ -118,6 +137,11 @@ export default {
 
 .form-group {
   margin-bottom: 25rpx;
+}
+
+.picker-group {
+  margin-bottom: 25rpx;
+  background-color: #fff;
 }
 
 .label {

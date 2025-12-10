@@ -1,6 +1,5 @@
 <template>
   <view>
-    <view>Calendar</view>
     <view class="container" v-if="showCalendar">
       <view @tap.stop>
         <uni-calendar
