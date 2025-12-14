@@ -1,0 +1,7 @@
+{
+  "name": "getDailyHRVStats",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

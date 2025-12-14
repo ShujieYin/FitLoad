@@ -1,170 +1,216 @@
 <template>
-  <view class="add-record-container">
-    <view class="header">
-      <text class="title">Edit Training Record</text>
-    </view>
+  <view class="page">
 
-    <view class="form-group">
-      <text class="label">RPE (1-10)</text>
-      <input type="number" v-model.number="rpe" min="1" max="10" class="input" placeholder="Enter RPE" />
-    </view>
+    <!-- 顶部添加记录按钮 -->
+    <button class="add-btn" @click="goAddRecord">Add New Record</button>
 
-    <view class="form-group">
-      <text class="label">Duration (minutes)</text>
-      <input type="number" v-model.number="duration" min="1" class="input" placeholder="Enter duration" />
-    </view>
+    <view v-if="loading">Loading...</view>
 
-    <view class="form-group">
-      <text class="label">Training Type</text>
-      <picker mode="selector" :range="categories" @change="categoryChange">
-        <view class="picker">{{ categories[categoryIndex] }}</view>
-      </picker>
-    </view>
+    <view v-else>
+      <view class="title">Training Records on {{ date }}</view>
 
-    <view class="form-group">
-      <text class="label">HRV (ms)(optional)</text>
-      <input type="number" v-model.number="hrv" min="0" class="input" placeholder="Enter HRV value" />
-    </view>
+      <view v-if="records.length === 0" class="no-data">
+        No records for this day.
+      </view>
 
-    <view class="form-group">
-      <text class="label">Notes</text>
-      <textarea v-model="note" class="textarea" placeholder="Add notes" />
-    </view>
+      <view
+        v-for="(item, index) in records"
+        :key="item._id"
+        class="card"
+      >
+        <view class="card-title">Record #{{ index + 1 }}</view>
 
-    <view class="load-display">
-      <text class="load-label">Load: {{ load }} (RPE x Duration)</text>
-    </view>
+        <!-- time of day enum -->
+        <view class="row">
+          <text>Time of Day</text>
+          <picker
+            mode="selector"
+            :range="timeOfDays"
+            @change="e => item.timeOfDay = timeOfDays[e.detail.value]"
+          >
+            <view class="picker-box">{{ item.timeOfDay }}</view>
+          </picker>
+        </view>
 
-    <button class="submit-btn" @click="submitRecord">Save Changes</button>
+        <!-- Category enum -->
+        <view class="row">
+          <text>Category</text>
+          <picker
+            mode="selector"
+            :range="categories"
+            @change="e => item.category = categories[e.detail.value]"
+          >
+            <view class="picker-box">{{ item.category }}</view>
+          </picker>
+        </view>
+
+        <view class="row">
+          <text>RPE</text>
+          <input type="number" v-model.number="item.rpe" />
+        </view>
+
+        <view class="row">
+          <text>Duration (min)</text>
+          <input type="number" v-model.number="item.duration" />
+        </view>
+
+        <view class="row">
+          <text>HRV (ms)(optional)</text>
+          <input type="number" v-model.number="item.hrv" />
+        </view>
+
+        <view class="row">
+          <text>Note</text>
+          <textarea v-model="item.note"></textarea>
+        </view>
+
+        <button class="save-btn" @click="save(item)">Save</button>
+      </view>
+
+    </view>
   </view>
 </template>
 
 <script>
+const app = getApp(); // 获取全局实例
+
 export default {
+  
   data() {
     return {
-      date: '',
-      rpe: 5,
-      duration: 60,
-      categoryIndex: 0,
-      categories: ['Full Body', 'Upper Body','Lower Body',"Basketball", "Cycling", 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms'],
-      note: '',
-      hrv: 0,
-      load: 300
+      date: "",
+      records: [],
+      loading: true,
+
+      // enum options
+      timeOfDays: app.globalData.timeOfDays,
+      categories: app.globalData.categories
     }
   },
 
-  onLoad(options) {
-    this.id = options.id;
-  this.date = options.date || this.getCurrentDate()
-    this.rpe = options.rpe
-    this.duration = options.duration
-    this.categoryIndex = this.categories.indexOf(options.category)
-    this.note = options.note
-    this.hrv = options.hrv || 0
-    this.updateLoad()
+  onLoad(option) {
+    this.date = option.date
+    this.fetchData()
   },
 
   methods: {
-    getCurrentDate() {
-      const date = new Date()
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    /** 新增跳转按钮 */
+    goAddRecord() {
+      uni.navigateTo({
+        url: `/pages/addRecord/addRecord?date=${this.date}`
+      })
     },
 
-    updateLoad() {
-      this.load = this.rpe * this.duration
+    async fetchData() {
+      const res = await uniCloud.callFunction({
+        name: "getDailyRecords",
+        data: { date: this.date }
+      })
+
+      if (res.result.code === 200) {
+        this.records = res.result.data
+      }
+      this.loading = false
     },
 
-    categoryChange(e) {
-      this.categoryIndex = e.detail.value
-    },
+    /** 保存一条记录 */
+    async save(item) {
+      const res = await uniCloud.callFunction({
+        name: "updateRecord",
+        data: {
+          id: item._id,
+          rpe: item.rpe,
+          duration: item.duration,
+          category: item.category,
+          hrv: item.hrv,
+          note: item.note,
+          timeOfDay: item.timeOfDay
+        }
+      })
 
-    async submitRecord() {
-      try {
-        await uniCloud.callFunction({
-          name: 'editRecord',
-          data: {
-            date: this.date,
-            rpe: this.rpe,
-            duration: this.duration,
-            hrv: this.hrv,
-            id: this.id,
-            category: this.categories[this.categoryIndex],
-            note: this.note
-          }
+      if (res.result.code === 200) {
+        uni.showToast({
+          title: "Updated",
+          icon: "success"
         })
-        uni.showToast({ title: 'Record updated!', icon: 'success' })
-        uni.navigateBack()
-      } catch (error) {
-        uni.showToast({ title: 'Failed to update', icon: 'error' })
+
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 600)
       }
     }
-  },
-
-  watch: {
-    rpe: 'updateLoad',
-    duration: 'updateLoad'
   }
 }
 </script>
 
 <style>
-.add-record-container {
-  padding: 20rpx;
-  background-color: #f5f5f5;
+.page {
+  padding: 20px;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 30rpx;
+.add-btn {
+  background: #34C759;
+  color: white;
+  margin-bottom: 16px;
+  width: 80%;
 }
 
 .title {
-  font-size: 36rpx;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.card {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 16px;
+  margin-bottom: 10px;
   font-weight: bold;
 }
 
-.form-group {
-  margin-bottom: 25rpx;
+.row {
+  margin-bottom: 14px;
 }
 
-.label {
-  display: block;
-  margin-bottom: 8rpx;
-  font-weight: 500;
+input{
+  background: #fff;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  width: 95%;
 }
 
-.input, .textarea {
-  width: 100%;
-  padding: 12rpx;
-  background-color: #fff;
-  border-radius: 8rpx;
-  border: 1px solid #eee;
-}
-
-.textarea {
+textarea{
   height: 120rpx;
-  line-height: 1.5;
+  line-height: 1.5;  
+  background: #fff;
+  width: 95%;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
 }
 
-.load-display {
-  background-color: #e6f7ff;
-  padding: 15rpx;
-  border-radius: 8rpx;
-  margin: 20rpx 0;
+.picker-box {
+  padding: 6px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  width: 95%;
 }
 
-.load-label {
-  color: #1890ff;
-  font-weight: 500;
-}
-
-.submit-btn {
-  background-color: #1890ff;
+.save-btn {
+  margin-top: 10px;
+  background: #007AFF;
   color: white;
-  border-radius: 8rpx;
-  padding: 15rpx;
-  font-size: 18px;
-  width: 100%;
+  width: 80%;
+}
+.no-data {
+  margin-top: 20px;
+  text-align: center;
 }
 </style>

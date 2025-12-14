@@ -1,95 +1,86 @@
 <template>
-  <view>
-    <view class="container" v-if="showCalendar">
-      <view @tap.stop>
-        <uni-calendar
-          ref="calendar"
-          class="uni-calendar--hook"
-          :selected="info.selected"
-          :showMonth="false"
-          @change="change"
-          @monthSwitch="monthSwitch"
-        />
-      </view>
+  <view class="container" v-if="showCalendar">
+    <uni-calendar
+      class="uni-calendar--hook"
+      :selected="selected"
+      :showMonth="false"
+      @change="onDateChange"
+      @monthSwitch="onMonthSwitch"
+    />
+
+    <!-- 示例：显示一天负载 -->
+    <view v-if="debugDay">
+      Load on {{ debugDay }}: {{ dailyLoad[debugDay] || 0 }}
     </view>
   </view>
 </template>
 
 <script>
-function getDate(date, AddDayCount = 0) {
-  if (!date) date = new Date();
-  if (typeof date !== 'object') date = date.replace(/-/g, '/');
-  const dd = new Date(date);
-  dd.setDate(dd.getDate() + AddDayCount);
-
-  const y = dd.getFullYear();
-  const m = dd.getMonth() + 1 < 10 ? '0' + (dd.getMonth() + 1) : dd.getMonth() + 1;
-  const d = dd.getDate() < 10 ? '0' + dd.getDate() : dd.getDate();
-  return {
-    fullDate: `${y}-${m}-${d}`,
-    year: y,
-    month: m,
-    date: d,
-    day: dd.getDay()
-  };
-}
-
 export default {
   data() {
     return {
-      showCalendar: false,
-      info: {
-        lunar: true,
-        range: false,
-        insert: false,
-        selected: []
-      }
-    };
+      showCalendar: true,
+      dailyLoad: {},  // { "2025-12-01": 120 }
+      selected: [],
+      debugDay: ""
+    }
   },
 
-  onReady() {
-    this.$nextTick(() => {
-      this.showCalendar = true;
-    });
-
-    setTimeout(() => {
-      this.info.selected = [
-        { date: getDate(new Date(), -3).fullDate, info: "打卡" },
-        { date: getDate(new Date(), -1).fullDate, info: "已打卡" }
-      ];
-    }, 500);
+  onLoad() {
+    const today = new Date()
+    this.fetchMonthLoad(today.getFullYear(), today.getMonth() + 1)
   },
 
   methods: {
-    // 点击日期
-    change(e) {
-      console.log("日期点击事件:", e);
+    /** 拉取当月 load */
+    async fetchMonthLoad(year, month) {
+      const res = await uniCloud.callFunction({
+        name: "getMonthlyRecordOverview",
+        data: { year, month }
+      })
 
-      const date = e.fulldate;
+      if (res.result.code !== 200) return
 
-      const isExisting = this.info.selected.some(
-        item => item.date === date
-      );
+      this.dailyLoad = res.result.data
 
-      // 🔥 必须是实际存在的页面路径！
-      const url = isExisting
-        ? `/pages/editRecord/editRecord?date=${date}`
-        : `/pages/addRecord/addRecord?date=${date}`;
-
-      console.log("跳转路径:", url);
-
-      uni.navigateTo({ url });
+      // 根据 dailyLoad 构造 selected 数组 → 让日历显示数字
+      this.selected = Object.keys(this.dailyLoad).map(date => ({
+        date,
+        info: this.dailyLoad[date] > 0 ? `${this.dailyLoad[date]}` : ""
+      }))
     },
 
-    monthSwitch(e) {
-      console.log("月份切换:", e);
+    /** 切换月份时触发 */
+    onMonthSwitch(e) {
+      const { year, month } = e
+      this.fetchMonthLoad(year, Number(month))
+    },
+
+    /** 点击日期 */
+    onDateChange(e) {
+      const date = e.fulldate   // YYYY-MM-DD
+      this.debugDay = date
+
+      const hasLoad = this.dailyLoad[date] && this.dailyLoad[date] > 0
+
+      if (hasLoad) {
+        // 有记录 → EDIT 页面
+        uni.navigateTo({
+          url: `/pages/editRecord/editRecord?date=${date}`
+        })
+      } else {
+        // 无记录 → ADD 页面
+        uni.navigateTo({
+          url: `/pages/addRecord/addRecord?date=${date}`
+        })
+      }
     }
   }
-};
+}
 </script>
 
-<style lang="scss">
+<style>
 .container {
-  padding: 20rpx;
+  padding: 10px;
 }
 </style>

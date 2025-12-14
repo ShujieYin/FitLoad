@@ -1,10 +1,10 @@
 {
   "bsonType": "object",
-  "required": ["user_id", "date", "time of day", "weekDay", "rpe", "hrv", "duration", "load", "category","day", "month", "year", "yearWeek"],
+  "required": ["user_id", "date", "timeOfDay", "weekDay", "rpe", "hrv", "duration", "load", "category","day", "month", "year", "yearWeek"],
   "properties": {
     "user_id": { "bsonType": "string" },
     "date": { "bsonType": "string", "description": "yyyy-mm-dd" },
-    "time of day":{
+    "timeOfDay":{
       "bsonType": "string",
       "enum": ["morning", "afternoon", "night"]
     },

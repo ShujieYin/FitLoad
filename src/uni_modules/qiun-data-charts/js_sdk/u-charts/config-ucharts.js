@@ -97,7 +97,7 @@ const cfu = {
   //下面是自定义配置，请添加项目所需的通用配置
 	"pie":{
 		"type": "pie",
-    "color": color,
+    	"color": color,
 		"padding": [5,5,5,5],
 		"extra": {
 			"pie": {
@@ -113,7 +113,7 @@ const cfu = {
 	},
 	"ring":{
 		"type": "ring",
-    "color": color,
+    	"color": color,
 		"padding": [5,5,5,5],
 		"rotate": false,
 		"dataLabel": true,
@@ -147,7 +147,7 @@ const cfu = {
 	},
 	"rose":{
 		"type": "rose",
-    "color": color,
+    	"color": color,
 		"padding": [5,5,5,5],
 		"legend": {
 			"show": true,
@@ -170,7 +170,7 @@ const cfu = {
 	},
 	"word":{
 		"type": "word",
-    "color": color,
+    	"color": color,
 		"extra": {
 			"word": {
 				"type": "normal",
@@ -180,7 +180,7 @@ const cfu = {
 	},
 	"funnel":{
 		"type": "funnel",
-    "color": color,
+    	"color": color,
 		"padding": [15,15,0,15],
 		"extra": {
 			"funnel": {
@@ -196,9 +196,9 @@ const cfu = {
 	},
 	"map":{
 		"type": "map",
-    "color": color,
+    	"color": color,
 		"padding": [0,0,0,0],
-    "dataLabel": true,
+    	"dataLabel": true,
 		"extra": {
 			"map": {
 				"border": true,
@@ -213,7 +213,7 @@ const cfu = {
 	},
 	"arcbar":{
 		"type": "arcbar",
-    "color": color,
+    	"color": color,
 		"title": {
 			"name": "百分比",
 			"fontSize": 25,
@@ -237,14 +237,17 @@ const cfu = {
 	},
 	"line":{
 		"type": "line",
-    "color": color,
+		"dataLabel": true,
+    	"color": color,
 		"padding": [15,10,0,15],
 		"xAxis": {
-      "disableGrid": true,
+      		"disableGrid": true,
+      		"rotateLabel": true,
+			"fontSize": 10,
 		},
 		"yAxis": {
-      "gridType": "dash",
-      "dashLength": 2,
+			"gridType": "dash",
+			"dashLength": 2,
 		},
 		"legend": {
 		},
@@ -317,7 +320,7 @@ const cfu = {
   },
 	"column":{
 		"type": "column",
-    "color": color,
+    	"color": color,
 		"padding": [15,15,0,5],
 		"xAxis": {
       "disableGrid": true,
@@ -408,7 +411,7 @@ const cfu = {
 		"type": "radar",
 		"color": color,
 		"padding": [5,5,5,5],
-    "dataLabel": false,
+    	"dataLabel": false,
 		"legend": {
 			"show": true,
 			"position": "right",
@@ -524,9 +527,12 @@ const cfu = {
 	"mix":{
 		"type": "mix",
 		"color": color,
+		// "dataLabel": false,
 		"padding": [15,15,0,15],
 		"xAxis": {
-      "disableGrid": true,
+			"disableGrid": true,
+			"rotateLabel": true,
+			"fontSize": 10,
 		},
 		"yAxis": {
 			"disabled": false,
@@ -536,7 +542,7 @@ const cfu = {
 			"dashLength": 4,
 			"gridColor": "#CCCCCC",
 			"padding": 10,
-			"showTitle": true,
+			"showTitle": false,
 			"data": []
 		},
 		"legend": {
@@ -544,62 +550,62 @@ const cfu = {
 		"extra": {
 			"mix": {
 				"column": {
-					"width": 20
+					"width": 20,
 				}
-			},
+			}
 		}
 	},
 	"scatter":{
 		"type": "scatter",
 		"color":color,
 		"padding":[15,15,0,15],
-    "dataLabel":false,
-    "xAxis": {
-      "disableGrid": false,
-      "gridType":"dash",
-      "splitNumber":5,
-      "boundaryGap":"justify",
-      "min":0
-    },
-    "yAxis": {
-      "disableGrid": false,
-      "gridType":"dash",
-    },
-    "legend": {
-    },
-    "extra": {
-    	"scatter": {
-    	},
-    }
+		"dataLabel":false,
+		"xAxis": {
+			"disableGrid": false,
+			"gridType":"dash",
+			"splitNumber":5,
+			"boundaryGap":"justify",
+			"min":0
+		},
+		"yAxis": {
+			"disableGrid": false,
+			"gridType":"dash",
+		},
+		"legend": {
+		},
+		"extra": {
+			"scatter": {
+			},
+		}
 	},
 	"bubble":{
 		"type": "bubble",
 		"color":color,
 		"padding":[15,15,0,15],
-    "xAxis": {
-      "disableGrid": false,
-      "gridType":"dash",
-      "splitNumber":5,
-      "boundaryGap":"justify",
-      "min":0,
-      "max":250
-    },
-    "yAxis": {
-      "disableGrid": false,
-      "gridType":"dash",
-      "data":[{
-        "min":0,
-        "max":150
-      }]
-    },
-    "legend": {
-    },
-    "extra": {
-    	"bubble": {
-        "border":2,
-        "opacity": 0.5,
-    	},
-    }
+		"xAxis": {
+			"disableGrid": false,
+			"gridType":"dash",
+			"splitNumber":5,
+			"boundaryGap":"justify",
+			"min":0,
+			"max":250
+		},
+		"yAxis": {
+			"disableGrid": false,
+			"gridType":"dash",
+		"data":[{
+			"min":0,
+			"max":150
+		}]
+		},
+		"legend": {
+		},
+		"extra": {
+			"bubble": {
+			"border":2,
+			"opacity": 0.5,
+			},
+		}
 	}
 }
 

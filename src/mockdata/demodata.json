@@ -90,39 +90,18 @@
 	"Mix": {
 		"categories": ["2016", "2017", "2018", "2019", "2020", "2021"],
 		"series": [{
-			"name": "曲面",
-			"data": [70, 50, 85, 130, 64, 88],
-			"type": "area",
-			"style": "curve"
-		}, {
-			"name": "柱1",
-      "index":1,
-			"data": [40, {"value": 30,"color": "#f04864"}, 55, 110, 24, 58],
+			"name": "Load",
+      		"index":1,
+			"data": [2000, {"value": 3000,"color": "#f04864"}, 1500, 3500, 2800, 3300],
 			"type": "column"
-		}, {
-			"name": "柱2",
-      "index":1,
-			"data": [50, 20, 75, 60, 34, 38],
-			"type": "column"
-		}, {
-			"name": "曲线",
-			"data": [70, 50, 85, 130, 64, 88],
+		},{
+			"name": "avgRPE",
+			"data": [7, 7.5, 6.5, 8, 5, 7.8],
 			"type": "line",
-			"style": "curve",
-			"color": "#1890ff",
-			"disableLegend": true
-		}, {
-			"name": "折线",
-			"data": [120, 140, 105, 170, 95, 160],
-			"type": "line",
+			"textSize": 1,
 			"color": "#2fc25b"
-		}, {
-			"name": "点",
-      "index":2,
-			"data": [100, 80, 125, 150, 112, 132],
-			"type": "point",
-			"color": "#f04864"
-		}]
+			}
+		]
 	},
 	"Line": {
 		"categories": ["2016", "2017", "2018", "2019", "2020", "2021"],

@@ -24,13 +24,13 @@ exports.main = async (event, context) => {
         user_id: userId,
         date: date
       })
-      .orderBy("time of day", "asc")
+      .orderBy("timeOfDay", "asc")
       .get()
 
     console.log("DB Result:", res.data)
 
     return {
-      code: 0,
+      code: 200,
       msg: "success",
       data: res.data
     }

@@ -4,7 +4,7 @@ exports.main = async (event, context) => {
   console.log("=== Incoming event ===", event)
   console.log("=== Context ===", context)
 
-  const { rpe, duration, category, hrv, note, date, "time of day": timeOfDay } = event
+  const { rpe, duration, category, hrv, note, date, timeOfDay } = event
 
   const load = rpe * duration
   const db = uniCloud.database()
@@ -35,7 +35,7 @@ exports.main = async (event, context) => {
     user_id: userId,
     rpe, duration, category, hrv, note,
     date,
-    "time of day": timeOfDay,
+    timeOfDay,
     weekDay,
     load,
 	day,

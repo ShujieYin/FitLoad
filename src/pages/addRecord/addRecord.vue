@@ -14,6 +14,15 @@
     </view>
 
     <view class="form-group">
+      <text class="label">Training Type</text>
+      <view class="picker-group">
+        <picker mode="selector" :range="categories" @change="categoryChange">
+          <view class="picker">{{ categories[categoryIndex] }}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-group">
       <text class="label">RPE (1-10)</text>
       <input type="number" v-model.number="rpe" min="1" max="10" class="input" placeholder="Enter RPE" />
     </view>
@@ -21,15 +30,6 @@
     <view class="form-group">
       <text class="label">Duration (minutes)</text>
       <input type="number" v-model.number="duration" min="1" class="input" placeholder="Enter duration" />
-    </view>
-
-    <view class="form-group">
-      <text class="label">Training Type</text>
-      <view class="picker-group">
-        <picker mode="selector" :range="categories" @change="categoryChange">
-          <view class="picker">{{ categories[categoryIndex] }}</view>
-        </picker>
-      </view>
     </view>
 
     <view class="form-group">
@@ -45,11 +45,13 @@
       <textarea v-model="note" class="textarea" placeholder="Add notes" />
     </view>
 
-    <button class="submit-btn" @click="submitRecord">Save Record</button>
+    <button class="submit-btn" @click="submitRecord">Add Record</button>
   </view>
 </template>
 
 <script>
+const app = getApp(); // 获取全局实例
+
 export default {
   data() {
     return {
@@ -57,9 +59,9 @@ export default {
       rpe: "",
       duration: "",
       categoryIndex: 0,
-      categories: ['Full Body', 'Upper Body','Lower Body',"Basketball", "Cycling", 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms'],
+      categories: app.globalData.categories,
       timeOfDayIndex:0,
-      timeOfDays: ["morning", "afternoon", "night"],
+      timeOfDays: app.globalData.timeOfDays,
       note: '',
       hrv: 0,
       load: 0
@@ -98,7 +100,7 @@ export default {
             duration: this.duration,
             hrv: this.hrv,
             category: this.categories[this.categoryIndex],
-            "time of day": this.timeOfDays[this.timeOfDayIndex],
+            timeOfDay: this.timeOfDays[this.timeOfDayIndex],
             note: this.note,
           }
         })
@@ -126,41 +128,41 @@ export default {
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 30rpx;
+  font-size: 20px;
+  margin-bottom: 10px;
 }
 
 .title {
-  font-size: 36rpx;
-  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 10px;
 }
 
 .form-group {
-  margin-bottom: 25rpx;
+  margin-bottom: 14px;
 }
 
-.picker-group {
-  margin-bottom: 25rpx;
-  background-color: #fff;
+.picker-group, input {
+  background: #fff;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  width: 95%;
 }
-
+/* 
 .label {
   display: block;
   margin-bottom: 8rpx;
   font-weight: 500;
-}
-
-.input, .textarea {
-  width: 100%;
-  padding: 12rpx;
-  background-color: #fff;
-  border-radius: 8rpx;
-  border: 1px solid #eee;
-}
+} */
 
 .textarea {
   height: 120rpx;
-  line-height: 1.5;
+  line-height: 1.5;  
+  background: #fff;
+  width: 95%;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
 }
 
 .load-display {
@@ -168,6 +170,7 @@ export default {
   padding: 15rpx;
   border-radius: 8rpx;
   margin: 20rpx 0;
+  width: 95%;
 }
 
 .load-label {
@@ -176,11 +179,9 @@ export default {
 }
 
 .submit-btn {
-  background-color: #1890ff;
+  margin-top: 10px;
+  background: #007AFF;
   color: white;
-  border-radius: 8rpx;
-  padding: 15rpx;
-  font-size: 18px;
-  width: 100%;
+  width: 80%;
 }
 </style>

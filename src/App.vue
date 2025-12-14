@@ -1,5 +1,12 @@
 <script>
 export default {
+  globalData: {
+    categories: ['Full Body', 'Upper Body','Lower Body',"Basketball", "Cycling","Jogging", 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms'],
+    timeOfDays: ["morning", "afternoon", "night"]
+  },
+  onLaunch() {
+    console.log("App launched");
+  },
   onLaunch: function () {
     console.log('App Launch')
   },
