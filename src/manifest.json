@@ -1,7 +1,7 @@
 {
-    "name" : "TrainingLoad",
+    "name" : "Ascent Log",
     "appid" : "__UNI__F0A39EB",
-    "description" : "",
+    "description" : "Path to Elite",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
@@ -50,7 +50,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wxa8ade32dc4e94503",
         "setting" : {
             "urlCheck" : false
         },

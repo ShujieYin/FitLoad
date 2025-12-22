@@ -108,7 +108,7 @@ export default {
         uni.navigateBack()
       } catch (error) {
         uni.showToast({ title: 'Failed to save', icon: 'error' })
-        console.error("调用失败", e)
+        console.error("调用失败", error)
       }
 
     }

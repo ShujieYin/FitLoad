@@ -1,4 +1,4 @@
-const { getISOWeek } = require('../common/utils.js')
+const { getISOWeek } = require('utils')
 
 exports.main = async (event, context) => {
   console.log("=== Incoming event ===", event)

@@ -1,6 +1,8 @@
 {
   "name": "addRecord",
-  "dependencies": {},
+  "dependencies": {
+    "utils": "file:../common/utils/index.js"
+  },
   "extensions": {
     "uni-cloud-jql": {}
   }

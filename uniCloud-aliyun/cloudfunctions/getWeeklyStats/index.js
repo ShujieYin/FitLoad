@@ -1,5 +1,6 @@
 'use strict'
-const { getISOWeek } = require('../common/utils.js')
+// const { getISOWeek } = require('../common/utils.js')
+const { getISOWeek } = require('utils')
 
 exports.main = async (event, context) => {
   const db = uniCloud.database()
