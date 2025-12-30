@@ -9,20 +9,15 @@ exports.main = async (event, context) => {
   // =====================
   // 1. 生成最近 11 周
   // =====================
-  const now = new Date()
-  const current = getISOWeek(now)
-
   const weeks = []
-  let year = current.year
-  let week = current.week
 
   for (let i = 0; i < 11; i++) {
-    weeks.unshift({ year, week }) // 保证时间正序
-    week--
-    if (week === 0) {
-      year--
-      week = getISOWeek(new Date(year, 11, 31)).week
-    }
+    // 计算前 i 周的日期
+    const date = new Date(now);
+    date.setDate(date.getDate() - i * 7);
+    
+    const weekInfo = getISOWeek(date);
+    weeks.unshift({ year: weekInfo.year, week: weekInfo.week });
   }
 
   // =====================
