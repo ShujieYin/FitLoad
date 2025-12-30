@@ -1,9 +1,0 @@
-{
-  "name": "wx-login",
-  "dependencies": {
-    "uni-id": "file:../common/uni-id"
-  },
-  "extensions": {
-    "uni-cloud-jql": {}
-  }
-}

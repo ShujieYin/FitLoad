@@ -1,0 +1,7 @@
+{
+  "name": "refresh-token",
+  "dependencies": {
+    "uni-id-common": "file:../common/uni-id-common/index.js"
+  },
+  "extensions": {}
+}

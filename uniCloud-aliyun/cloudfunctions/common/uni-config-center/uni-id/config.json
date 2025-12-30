@@ -1,0 +1,107 @@
+{
+  "passwordSecret": "2KHXK2D4x9FBhVbCyUIKCFbktHeP5yHE", 
+  "passwordStrength": "medium",
+  "tokenSecret": "rYOYddK1biZ9zJMVcEPu", 
+  "requestAuthSecret": "", 
+  "tokenExpiresIn": 7200, 
+  "tokenExpiresThreshold": 3600,
+  "maxTokenLength": 10, 
+  "passwordErrorLimit": 6, 
+  "passwordErrorRetryTime": 3600, 
+  "autoSetInviteCode": false, 
+  "forceInviteCode": false, 
+  "idCardCertifyLimit": 1, 
+  "realNameCertifyLimit": 5, 
+  "sensitiveInfoEncryptSecret": "", 
+  "frvNeedAlivePhoto": false, 
+  "userRegisterDefaultRole": [], 
+  "app": { 
+    "tokenExpiresIn": 2592000,
+    "tokenExpiresThreshold": 864000,
+    "oauth": {
+      "weixin": {
+        "appid": "",
+        "appsecret": ""
+      },
+      "qq": {
+        "appid": "",
+        "appsecret": ""
+      },
+      "apple": { 
+        "bundleId": ""
+      },
+      "huawei": { 
+        "clientId": "",
+        "clientSecret": ""
+      }
+    }
+  },
+  "web": { 
+    "tokenExpiresIn": 7200,
+    "tokenExpiresThreshold": 3600,
+    "oauth": {
+      "weixin-h5": { 
+        "appid": "",
+        "appsecret": ""
+      },
+      "weixin-web": { 
+        "appid": "",
+        "appsecret": ""
+      }
+    }
+  },
+  "mp-weixin": {
+    "tokenExpiresIn": 259200,
+    "tokenExpiresThreshold": 86400,
+    "oauth": {
+      "weixin": {
+        "appid": "wxa8ade32dc4e94503",
+        "appsecret": "3283b833514c23156af2f4351d6b0315"
+      }
+    }
+  },
+  "mp-qq": {
+    "tokenExpiresIn": 259200,
+    "tokenExpiresThreshold": 86400,
+    "oauth": {
+      "qq": {
+        "appid": "",
+        "appsecret": ""
+      }
+    }
+  },
+  "mp-alipay": {
+    "tokenExpiresIn": 259200,
+    "tokenExpiresThreshold": 86400,
+    "oauth": {
+      "alipay": {
+        "appid": "",
+        "privateKey": "", 
+        "keyType": "PKCS8" 
+      }
+    }
+  },
+  "mp-harmony": {
+      "oauth": {
+        "huawei": { 
+          "clientId": "",
+          "clientSecret": ""
+        }
+      }
+  },
+  "service": {
+    "sms": {
+      "name": "", 
+      "codeExpiresIn": 180, 
+      "scene": {
+        "bind-mobile-by-sms": { 
+          "templateId": "", 
+          "codeExpiresIn": 240 
+        }
+      }
+    },
+    "univerify": {
+      "appid": "" 
+    }
+  }
+}

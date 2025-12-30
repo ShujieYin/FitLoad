@@ -1,0 +1,40 @@
+{
+  "bsonType": "object",
+  "required": ["openid", "created_at"],
+  "properties": {
+    "_id": {
+      "description": "用户ID",
+      "bsonType": "string"
+    },
+    "openid": {
+      "description": "第三方平台 openid",
+      "bsonType": "object",
+      "properties": {
+        "mp-weixin": {
+          "bsonType": "string",
+          "description": "微信小程序 openid"
+        }
+      }
+    },
+    "unionid": {
+      "bsonType": ["string", "null"],
+      "description": "微信 unionid"
+    },
+    "nickname": {
+      "bsonType": "string",
+      "description": "昵称"
+    },
+    "avatar": {
+      "bsonType": "string",
+      "description": "头像"
+    },
+    "created_at": {
+      "bsonType": "date",
+      "description": "创建时间"
+    },
+    "last_login_at": {
+      "bsonType": "date",
+      "description": "最后登录时间"
+    }
+  }
+}

@@ -9,6 +9,7 @@ exports.main = async (event, context) => {
   // =====================
   // 1. 生成最近 11 周
   // =====================
+  const now = new Date();
   const weeks = []
 
   for (let i = 0; i < 11; i++) {
