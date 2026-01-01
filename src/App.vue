@@ -3,8 +3,8 @@ import { initAuth } from '@/utils/auth.js'
 
 export default {
   globalData: {
-    categories: ['Full Body', 'Upper Body','Lower Body',"Basketball", "Cycling","Jogging", 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms'],
-    timeOfDays: ["morning", "afternoon", "night"]
+    categories: ['Full Body', "Plyometrics", 'Upper Body', 'Lower Body', "Basketball", "Cycling", "Jogging", "Others"],
+    timeOfDays: ["Morning", "Afternoon", "Night"]
   },
   
   async onLaunch() {

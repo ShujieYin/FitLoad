@@ -73,6 +73,7 @@
 
 <script>
 const app = getApp(); // 获取全局实例
+import { callFunction } from '@/utils/request.js'
 
 export default {
   
@@ -94,11 +95,55 @@ export default {
   },
 
   methods: {
-    /** 新增跳转按钮 */
+
     goAddRecord() {
       uni.navigateTo({
         url: `/pages/addRecord/addRecord?date=${this.date}`
       })
+    },
+
+    validateRecord(item) {
+      // RPE
+      if (
+        item.rpe === '' ||
+        isNaN(item.rpe) ||
+        item.rpe < 1 ||
+        item.rpe > 10
+      ) {
+        uni.showToast({
+          title: 'RPE 必须是 1-10 的数字',
+          icon: 'none'
+        })
+        return false
+      }
+
+      // Duration
+      if (
+        item.duration === '' ||
+        isNaN(item.duration) ||
+        item.duration < 0
+      ) {
+        uni.showToast({
+          title: 'Duration 必须是 ≥ 0 的数字',
+          icon: 'none'
+        })
+        return false
+      }
+
+      // HRV（可选）
+      if (
+        item.hrv !== '' &&
+        item.hrv !== null &&
+        (isNaN(item.hrv) || item.hrv < 0)
+      ) {
+        uni.showToast({
+          title: 'HRV 必须是 ≥ 0 的数字',
+          icon: 'none'
+        })
+        return false
+      }
+
+      return true
     },
 
     async fetchData() {
@@ -115,9 +160,13 @@ export default {
 
     /** 保存一条记录 */
     async save(item) {
-      const res = await uniCloud.callFunction({
-        name: "updateRecord",
-        data: {
+      if (!this.validateRecord(item)) {
+        return
+      }
+
+      const res = await callFunction(
+         "updateRecord",
+        {
           id: item._id,
           rpe: item.rpe,
           duration: item.duration,
@@ -126,7 +175,7 @@ export default {
           note: item.note,
           timeOfDay: item.timeOfDay
         }
-      })
+      )
 
       if (res.result.code === 200) {
         uni.showToast({
@@ -134,9 +183,12 @@ export default {
           icon: "success"
         })
 
+        // 触发全局事件通知刷新
+        uni.$emit('refreshRecords')
+        // 延迟返回，确保事件已触发
         setTimeout(() => {
           uni.navigateBack()
-        }, 600)
+        }, 300)
       }
     }
   }

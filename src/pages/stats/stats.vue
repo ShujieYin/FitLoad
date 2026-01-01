@@ -56,6 +56,8 @@
 //下面是演示数据，您的项目不需要引用，数据需要您从服务器自行获取
 // import demodata from '@/mockdata/demodata.json';
 
+import { callFunction } from '@/utils/request.js'
+
 export default {
   data() {
     return {
@@ -108,10 +110,10 @@ export default {
     },
 
     async fetchWeeklyStats() {
-      const res = await uniCloud.callFunction({
-        name: "getWeeklyStats",
-        data: {}
-      })
+      const res = await callFunction(
+         "getWeeklyStats",
+        {}
+      )
 
       if (res.result.code !== 200) return
 
@@ -124,12 +126,12 @@ export default {
     },
 
     async loadHRVStats() {
-      const res = await uniCloud.callFunction({
-        name: 'getDailyHRVStats',
-        data: {
+      const res = await callFunction(
+        'getDailyHRVStats',
+        {
           weeks: this.hrvWeeks
         }
-      })
+      )
 
       const days = res.result.data.days
 

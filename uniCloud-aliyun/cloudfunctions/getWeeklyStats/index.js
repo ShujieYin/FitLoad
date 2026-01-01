@@ -1,10 +1,12 @@
 'use strict'
-// const { getISOWeek } = require('../common/utils.js')
+
 const { getISOWeek } = require('utils')
+const auth = require('auth')
 
 exports.main = async (event, context) => {
   const db = uniCloud.database()
-  const userId = context.auth?.uid || 'demo'
+  const { uid } = await auth(context) 
+  const userId = uid
 
   // =====================
   // 1. 生成最近 11 周

@@ -1,0 +1,6 @@
+{
+  "name": "auth",
+  "dependencies": {
+    "uni-id-common": "file:../uni-id-common"
+  }
+}

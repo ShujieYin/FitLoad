@@ -1,6 +1,8 @@
 {
   "name": "getDailyHRVStats",
-  "dependencies": {},
+  "dependencies": {
+    "auth": "file:../common/auth"
+  },
   "extensions": {
     "uni-cloud-jql": {}
   }

@@ -1,7 +1,8 @@
 {
   "name": "getWeeklyStats",
   "dependencies": {
-    "utils": "file:../common/utils/index.js"
+    "utils": "file:../common/utils",
+    "auth": "file:../common/auth"
   },
   "extensions": {
     "uni-cloud-jql": {}

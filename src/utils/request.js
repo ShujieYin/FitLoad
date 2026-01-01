@@ -1,26 +1,29 @@
 import { refreshToken } from './token.js'
-import { weixinLogin } from './login.js'
+import { loginByWeixin } from './login.js'
+
+const TOKEN_ERROR_CODES = [30202, 30203] // check failed / expired
 
 export async function callFunction(name, data = {}) {
-  let token = uni.getStorageSync('token')
+  let token = uni.getStorageSync('uni_id_token')
 
   let res = await uniCloud.callFunction({
     name,
     data,
-    header: {
-      Authorization: token
-    }
+    header: token
+      ? { Authorization: 'Bearer ' + token }
+      : {}
   })
 
-  // token 失效（uni-id 标准错误码）
-  if (res.result?.code === 30201) {
+  const errCode = res.result?.code || res.result?.errCode
+
+  if (TOKEN_ERROR_CODES.includes(errCode)) {
     try {
       await refreshToken()
     } catch (e) {
-      await weixinLogin()
+      await loginByWeixin()
     }
 
-    // 重试一次
+    // 🔁 重试一次
     return callFunction(name, data)
   }
 

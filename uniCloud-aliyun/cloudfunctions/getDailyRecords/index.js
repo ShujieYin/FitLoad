@@ -1,9 +1,10 @@
 'use strict';
+const auth = require('auth')
 
 exports.main = async (event, context) => {
   const db = uniCloud.database()
-  // const userId = context.auth?.uid || "NO_AUTH_USER"
-  const userId = "demo" //测试用
+  const { uid } = await auth(context) 
+  const userId = uid
 
   const { date } = event   // 期望格式：yyyy-mm-dd
 
@@ -14,9 +15,9 @@ exports.main = async (event, context) => {
     }
   }
 
-  console.log("=== Fetching Records ===")
-  console.log("UserId:", userId)
-  console.log("Date:", date)
+  // console.log("=== Fetching Records ===")
+  // console.log("UserId:", userId)
+  // console.log("Date:", date)
 
   try {
     const res = await db.collection('training_record')
@@ -27,6 +28,7 @@ exports.main = async (event, context) => {
       .orderBy("timeOfDay", "asc")
       .get()
 
+    console.log("userID:", userId)
     console.log("DB Result:", res.data)
 
     return {

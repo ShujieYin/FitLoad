@@ -1,0 +1,7 @@
+{
+  "name": "getWexinOpenID",
+  "dependencies": {
+    "uni-id-common": "file:../common/uni-id-common"
+  },
+  "extensions": {}
+}

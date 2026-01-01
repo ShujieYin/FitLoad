@@ -1,6 +1,8 @@
 {
   "name": "getDailyRecords",
-  "dependencies": {},
+  "dependencies": {
+    "auth": "file:../common/auth"
+  },
   "extensions": {
     "uni-cloud-jql": {}
   }

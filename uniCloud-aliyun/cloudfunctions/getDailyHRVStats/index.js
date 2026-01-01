@@ -1,8 +1,10 @@
 'use strict'
+const auth = require('auth')
 
 exports.main = async (event, context) => {
   const db = uniCloud.database()
-  const userId = context.auth?.uid || 'demo'
+  const { uid } = await auth(context) 
+  const userId = uid
 
   // =====================
   // 1. 时间窗口（可配置）

@@ -1,8 +1,13 @@
 'use strict';
 
+const auth = require('auth')
+
 exports.main = async (event, context) => {
   const db = uniCloud.database()
-  const userId = context.auth?.uid || "demo"  // 你本地调试可以改成固定 uid
+  // const userId = context.auth?.uid || "demo"
+  // const userId = context.auth.uid
+  const { uid } = await auth(context) 
+  const userId = uid
 
   const { year, month } = event
   if (!year || !month) {

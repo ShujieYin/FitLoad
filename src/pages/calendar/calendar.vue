@@ -9,9 +9,9 @@
     />
 
     <!-- 示例：显示一天负载 -->
-    <view v-if="debugDay">
+    <!-- <view v-if="debugDay">
       Load on {{ debugDay }}: {{ dailyLoad[debugDay] || 0 }}
-    </view>
+    </view> -->
   </view>
 </template>
 
@@ -28,6 +28,10 @@ export default {
 
   onLoad() {
     const today = new Date()
+    // 监听刷新事件
+    uni.$on('refreshRecords', () => {
+      this.fetchMonthLoad(today.getFullYear(), today.getMonth() + 1)
+    })
     this.fetchMonthLoad(today.getFullYear(), today.getMonth() + 1)
   },
 
@@ -46,7 +50,7 @@ export default {
       // 根据 dailyLoad 构造 selected 数组 → 让日历显示数字
       this.selected = Object.keys(this.dailyLoad).map(date => ({
         date,
-        info: this.dailyLoad[date] > 0 ? `${this.dailyLoad[date]}` : ""
+        info: this.dailyLoad[date] >= 0 ? `${this.dailyLoad[date]}` : ""
       }))
     },
 
@@ -61,7 +65,7 @@ export default {
       const date = e.fulldate   // YYYY-MM-DD
       this.debugDay = date
 
-      const hasLoad = this.dailyLoad[date] && this.dailyLoad[date] > 0
+      const hasLoad = this.dailyLoad[date] >= 0
 
       if (hasLoad) {
         // 有记录 → EDIT 页面

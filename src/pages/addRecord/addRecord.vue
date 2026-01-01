@@ -51,6 +51,7 @@
 
 <script>
 const app = getApp(); // 获取全局实例
+import { callFunction } from '@/utils/request.js'
 
 export default {
   data() {
@@ -79,6 +80,50 @@ export default {
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
     },
 
+    validateNumbers() {
+      // RPE
+      if (
+        this.rpe === '' ||
+        isNaN(this.rpe) ||
+        this.rpe < 1 ||
+        this.rpe > 10
+      ) {
+        uni.showToast({
+          title: 'RPE 必须是 1-10 的数字',
+          icon: 'none'
+        })
+        return false
+      }
+
+      // Duration
+      if (
+        this.duration === '' ||
+        isNaN(this.duration) ||
+        this.duration < 0
+      ) {
+        uni.showToast({
+          title: 'Duration 必须是 ≥ 0 的数字',
+          icon: 'none'
+        })
+        return false
+      }
+
+      // HRV（可选）
+      if (
+        this.hrv !== '' &&
+        this.hrv !== null &&
+        (isNaN(this.hrv) || this.hrv < 0)
+      ) {
+        uni.showToast({
+          title: 'HRV 必须是 ≥ 0 的数字',
+          icon: 'none'
+        })
+        return false
+      }
+
+      return true
+    },
+
     updateLoad() {
       this.load = this.rpe * this.duration
     },
@@ -86,15 +131,20 @@ export default {
     categoryChange(e) {
       this.categoryIndex = e.detail.value
     },
+
     timeOfDayChange(e) {
       this.timeOfDayIndex = e.detail.value
     },
 
     async submitRecord() {
+      if (!this.validateNumbers()) {
+        return
+      }
+
       try {
-        await uniCloud.callFunction({
-          name: 'addRecord',
-          data: {
+        await callFunction(
+          'addRecord',
+          {
             date: this.date,
             rpe: this.rpe,
             duration: this.duration,
@@ -103,9 +153,15 @@ export default {
             timeOfDay: this.timeOfDays[this.timeOfDayIndex],
             note: this.note,
           }
-        })
+        )
         uni.showToast({ title: 'Record saved!', icon: 'success' })
-        uni.navigateBack()
+
+        // 触发全局事件通知刷新
+        uni.$emit('refreshRecords')
+        // 延迟返回，确保事件已触发
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 300)
       } catch (error) {
         uni.showToast({ title: 'Failed to save', icon: 'error' })
         console.error("调用失败", error)

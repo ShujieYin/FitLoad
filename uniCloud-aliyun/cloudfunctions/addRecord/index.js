@@ -1,19 +1,25 @@
+'use strict'
+
 const { getISOWeek } = require('utils')
+const auth = require('auth')
 
 exports.main = async (event, context) => {
-  console.log("=== Incoming event ===", event)
-  console.log("=== Context ===", context)
+  // console.log("=== Incoming event ===", event)
+  // console.log("=== Context ===", context)
+  // console.log('完整的context:', JSON.stringify(context))
 
   const { rpe, duration, category, hrv, note, date, timeOfDay } = event
 
   const load = rpe * duration
   const db = uniCloud.database()
   
-  // const userId = context.auth?.uid || "NO_UID"
-  const userId = "demo" //测试用
-
-  console.log("UserId:", userId)
-  console.log("Load:", load)
+  // const userId = context.auth.uid
+  const { uid } = await auth(context) 
+  const userId = uid
+  // console.log("解析后的context:", auth(context))
+  // console.log("UserId:", userId)
+  
+  // console.log("Load:", load)
 
   // 日期解析
   const parsedDate = new Date(date)
@@ -27,8 +33,6 @@ exports.main = async (event, context) => {
   
 
   const { year, week } = getISOWeek(parsedDate)
-  console.log("ISO Year:", year)
-  console.log("ISO Week:", week)
 
   // 即将写入数据库的对象
   const record = {
@@ -38,8 +42,8 @@ exports.main = async (event, context) => {
     timeOfDay,
     weekDay,
     load,
-	day,
-	month,
+	  day,
+	  month,
     year,
     yearWeek: week,
     created_at: Date.now()
