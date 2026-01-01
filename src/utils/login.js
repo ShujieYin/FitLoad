@@ -1,18 +1,23 @@
-export async function weixinLogin() {
-  const loginRes = await uni.login({ provider: 'weixin' })
-  const code = loginRes.code
-
-  const res = await uniCloud.callFunction({
-    name: 'login-weixin',
-    data: { code }
+export function getWxCode() {
+  return new Promise((resolve, reject) => {
+    uni.login({
+      provider: 'weixin',
+      success: res => resolve(res.code),
+      fail: reject
+    })
   })
+}
 
-  if (res.result.code !== 0) {
-    throw new Error('login failed')
-  }
+const uniIdCo = uniCloud.importObject('uni-id-co')
 
-  const { token, tokenExpired } = res.result.data
+export async function loginByWeixin() {
+  const code = await getWxCode()
 
-  uni.setStorageSync('token', token)
-  uni.setStorageSync('tokenExpired', tokenExpired)
+  const res = await uniIdCo.loginByWeixin({ code })
+
+  // 官方返回结构
+  // { errCode, newToken.token, newToken.tokenExpired, uid, ... }
+  // token & tokenExpired 自动存储到uni_id_token & uni_id_token_expired 里
+  // console.log("login succeeded")
+  return res
 }
