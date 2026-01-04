@@ -54,10 +54,7 @@ export default {
   },
 
   onLoad() {
-    const userInfo = uni.getStorageSync('userInfo')
-    if (userInfo?.nickname && userInfo?.avatar) {
-      uni.switchTab({ url: '/pages/calendar/calendar' })
-    }
+    this.loadPage()
   },
 
   
@@ -122,6 +119,37 @@ export default {
         })
       }
     },
+
+    async loadNickname() {
+
+      const res = await callFunction(
+        'getUserProfile',
+        {}
+      )
+
+      const userInfo = res.result.data
+
+      // 保存到本地
+      uni.setStorageSync('userInfo', {
+        nickname: userInfo.nickname,
+        avatar: userInfo.avatar
+      });
+    },
+    async loadPage() {
+      let userInfo = uni.getStorageSync('userInfo')
+
+      if (!userInfo) {
+        await this.loadNickname()
+        userInfo = uni.getStorageSync('userInfo')
+      }
+
+      if (userInfo?.nickname && userInfo?.avatar) {
+        uni.switchTab({
+          url: '/pages/calendar/calendar'
+        })
+      }
+    },
+
 
     openPrivacy() {
       uni.navigateTo({
