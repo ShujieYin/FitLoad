@@ -3,11 +3,11 @@ const auth = require('auth')
 
 exports.main = async (event, context) => {
   const db = uniCloud.database()
-  const { uid } = await auth(context) 
-  const userId = uid
+  const $ = db.command.aggregate
+  const { uid } = await auth(context)
 
   // =====================
-  // 1. 时间窗口（可配置）
+  // 1. 时间窗口
   // =====================
   const WEEKS = event.weeks || 8
   const DAYS = WEEKS * 7
@@ -18,44 +18,34 @@ exports.main = async (event, context) => {
   const startDate = new Date(today)
   startDate.setDate(today.getDate() - DAYS + 1)
 
-  // =====================
-  // 2. 粗筛：查相关年份
-  // =====================
-  const startYear = startDate.getFullYear()
-  const endYear = today.getFullYear()
+  const startStr = startDate.toISOString().slice(0, 10)
+  const endStr = today.toISOString().slice(0, 10)
 
-  const res = await db.collection('training_record')
-    .where({
-      user_id: userId,
-      year: db.command.in(
-        startYear === endYear
-          ? [startYear]
-          : [startYear, endYear]
-      )
+  // =====================
+  // 2. DB 内筛选 + 按天聚合（修正点在这里）
+  // =====================
+  const aggRes = await db.collection('training_record')
+    .aggregate()
+    .match({
+      user_id: uid,
+      $and: [
+        { date: $.gte(startStr) },
+        { date: $.lte(endStr) }
+      ]
     })
-    .get()
-
-  const records = res.data || []
+    .group({
+      _id: '$date',
+      sum: $.sum('$hrv'),
+      count: $.sum(1)
+    })
+    .end()
 
   // =====================
-  // 3. JS 精确过滤 + 按天聚合
+  // 3. 转 map
   // =====================
   const dailyMap = {}
-
-  records.forEach(r => {
-    const d = new Date(r.year, r.month - 1, r.day)
-    d.setHours(0, 0, 0, 0)
-
-    if (d < startDate || d > today) return
-
-    const key = `${r.year}-${String(r.month).padStart(2, '0')}-${String(r.day).padStart(2, '0')}`
-
-    if (!dailyMap[key]) {
-      dailyMap[key] = { sum: 0, count: 0 }
-    }
-
-    dailyMap[key].sum += r.hrv
-    dailyMap[key].count++
+  aggRes.data.forEach(item => {
+    dailyMap[item._id] = Number((item.sum / item.count).toFixed(1))
   })
 
   // =====================
@@ -65,18 +55,11 @@ exports.main = async (event, context) => {
   const cursor = new Date(startDate)
 
   while (cursor <= today) {
-    const y = cursor.getFullYear()
-    const m = cursor.getMonth() + 1
-    const d = cursor.getDate()
-
-    const key = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    const data = dailyMap[key]
+    const key = cursor.toISOString().slice(0, 10)
 
     result.push({
       date: key,
-      avgHRV: data
-        ? Number((data.sum / data.count).toFixed(1))
-        : null
+      avgHRV: dailyMap[key] ?? null
     })
 
     cursor.setDate(cursor.getDate() + 1)

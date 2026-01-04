@@ -1,78 +1,102 @@
 'use strict'
 
-const { getISOWeek } = require('utils')
 const auth = require('auth')
 
 exports.main = async (event, context) => {
   const db = uniCloud.database()
-  const { uid } = await auth(context) 
-  const userId = uid
+  const $ = db.command.aggregate
+  const { uid } = await auth(context)
 
   // =====================
-  // 1. 生成最近 11 周
+  // 1. 计算最近 11 周时间范围
   // =====================
-  const now = new Date();
-  const weeks = []
+  const WEEKS = 11
+  const DAYS = WEEKS * 7
 
-  for (let i = 0; i < 11; i++) {
-    // 计算前 i 周的日期
-    const date = new Date(now);
-    date.setDate(date.getDate() - i * 7);
-    
-    const weekInfo = getISOWeek(date);
-    weeks.unshift({ year: weekInfo.year, week: weekInfo.week });
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const startDate = new Date(today)
+  startDate.setDate(today.getDate() - DAYS + 1)
+
+  const startStr = startDate.toISOString().slice(0, 10)
+  const endStr = today.toISOString().slice(0, 10)
+
+  // =====================
+  // 2. DB 内：date 范围筛选 + 按周聚合
+  // =====================
+  const aggRes = await db.collection('training_record')
+    .aggregate()
+    .match({
+      user_id: uid,
+      $and: [
+        { date: $.gte(startStr) },
+        { date: $.lte(endStr) }
+      ]
+    })
+    .group({
+      _id: {
+        year: '$year',
+        week: '$yearWeek'
+      },
+      totalLoad: $.sum('$load'),
+      totalRpe: $.sum('$rpe'),
+      count: $.sum(1)
+    })
+    .sort({
+      '_id.year': 1,
+      '_id.week': 1
+    })
+    .end()
+
+  // =====================
+  // 3. 转成 week map
+  // =====================
+  const weeklyMap = {}
+  aggRes.data.forEach(item => {
+    const key = `${item._id.year}-${item._id.week}`
+    weeklyMap[key] = {
+      year: item._id.year,
+      week: item._id.week,
+      totalLoad: item.totalLoad,
+      avgRpe: Number((item.totalRpe / item.count).toFixed(2))
+    }
+  })
+
+  // =====================
+  // 4. 补全最近 11 周（防断周）
+  // =====================
+  const weeklyStats = []
+  const cursor = new Date(startDate)
+
+  while (weeklyStats.length < WEEKS) {
+    const temp = new Date(cursor)
+    temp.setDate(temp.getDate() + 6)
+
+    const year = temp.getFullYear()
+
+    // ISO week 计算（不依赖 utils）
+    const firstThursday = new Date(year, 0, 4)
+    const week =
+      Math.ceil(
+        ((temp - firstThursday) / 86400000 +
+          firstThursday.getDay() + 1) / 7
+      )
+
+    const key = `${year}-${week}`
+    const data = weeklyMap[key]
+
+    weeklyStats.push({
+      label: `CW${week}`,
+      totalLoad: data ? data.totalLoad : 0,
+      avgRpe: data ? data.avgRpe : 0
+    })
+
+    cursor.setDate(cursor.getDate() + 7)
   }
 
   // =====================
-  // 2. 查询数据库
-  // =====================
-  const res = await db.collection('training_record')
-    .where({
-      user_id: userId,
-      $or: weeks.map(w => ({
-        year: w.year,
-        yearWeek: w.week
-      }))
-    })
-    .get()
-
-  const records = res.data || []
-
-  // =====================
-  // 3. 按周聚合
-  // =====================
-  const weeklyMap = {}
-
-  records.forEach(r => {
-    const key = `${r.year}-${r.yearWeek}`
-    if (!weeklyMap[key]) {
-      weeklyMap[key] = {
-        year: r.year,
-        week: r.yearWeek,
-        totalLoad: 0,
-        totalRpe: 0,
-        count: 0
-      }
-    }
-    weeklyMap[key].totalLoad += r.load
-    weeklyMap[key].totalRpe += r.rpe
-    weeklyMap[key].count++
-  })
-
-  const weeklyStats = weeks.map(w => {
-    const key = `${w.year}-${w.week}`
-    const data = weeklyMap[key]
-    return {
-      label: `CW${w.week}`,
-      totalLoad: data ? data.totalLoad : 0,
-      avgRpe: data
-        ? Number((data.totalRpe / data.count).toFixed(2))
-        : 0
-    }
-  })
-
-  // =====================
-  // 4. 计算 ACWR
+  // 5. 计算 ACWR
   // =====================
   const coupled = []
   const uncoupled = []
@@ -85,18 +109,14 @@ exports.main = async (event, context) => {
     }
 
     const loadThisWeek = w.totalLoad
-
     const last3 = weeklyStats
       .slice(idx - 3, idx)
       .map(i => i.totalLoad)
 
     const last4 = [...last3, loadThisWeek]
 
-    const avgLast3 =
-      last3.reduce((a, b) => a + b, 0) / 3
-
-    const avgLast4 =
-      last4.reduce((a, b) => a + b, 0) / 4
+    const avgLast3 = last3.reduce((a, b) => a + b, 0) / 3
+    const avgLast4 = last4.reduce((a, b) => a + b, 0) / 4
 
     uncoupled.push(
       avgLast3 === 0 ? null : Number((loadThisWeek / avgLast3).toFixed(2))
@@ -108,7 +128,7 @@ exports.main = async (event, context) => {
   })
 
   // =====================
-  // 5. 前端只用最近 8 周
+  // 6. 前端只用最近 8 周
   // =====================
   const displayStart = weeklyStats.length - 8
 
