@@ -147,10 +147,10 @@ export default {
     },
 
     async fetchData() {
-      const res = await uniCloud.callFunction({
-        name: "getDailyRecords",
-        data: { date: this.date }
-      })
+      const res = await callFunction(
+        "getDailyRecords",
+        { date: this.date }
+      )
 
       if (res.result.code === 200) {
         this.records = res.result.data

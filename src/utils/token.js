@@ -5,8 +5,8 @@ export async function refreshToken() {
 
   const res = await uniIdCo.refreshToken({ token })
 
-  // uni.setStorageSync('token', res.newToken.token)
-  // uni.setStorageSync('tokenExpired', res.newToken.tokenExpired)
+  uni.setStorageSync('token', res.newToken.token)
+  uni.setStorageSync('tokenExpired', res.newToken.tokenExpired)
   // console.log("RES: ", res)
   return res
 }

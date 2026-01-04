@@ -81,11 +81,11 @@ export default {
       dataHRV:{},
       hrvDates: [],
       hrvAvgData: [],
-      hrvWeeks: 8   
+      hrvWeeks: 4
     }
   },
 
-  onLoad(){
+  onShow(){
     this.init()
   },
 

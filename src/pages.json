@@ -1,17 +1,23 @@
 {
   "pages": [
-	  // {
-    //   "path": "pages/index/index",
-    //   "style": {
-    //     "navigationBarTitleText": "index"
-    //   }
-    // },
-	  // {
-    //   "path": "pages/auth/auth",
-    //   "style": {
-    //     "navigationBarTitleText": "auth"
-    //   }
-    // },
+	  {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "login"
+      }
+    },
+	  {
+      "path": "pages/userInfo/userInfo",
+      "style": {
+        "navigationBarTitleText": "userInfo"
+      }
+    },
+    {
+      "path": "pages/privacy/index",
+      "style": {
+        "navigationBarTitleText": "privacy"
+      }
+    },
 	  {
       "path": "pages/calendar/calendar",
       "style": {

@@ -1,0 +1,7 @@
+{
+  "name": "updateUserProfile",
+  "dependencies": {
+    "auth": "file:../common/auth"
+  },
+  "extensions": {}
+}

@@ -17,7 +17,8 @@ export async function loginByWeixin() {
 
   // 官方返回结构
   // { errCode, newToken.token, newToken.tokenExpired, uid, ... }
-  // token & tokenExpired 自动存储到uni_id_token & uni_id_token_expired 里
+  uni.setStorageSync('token', res.newToken.token)
+  uni.setStorageSync('tokenExpired', res.newToken.tokenExpired)
   // console.log("login succeeded")
   return res
 }
