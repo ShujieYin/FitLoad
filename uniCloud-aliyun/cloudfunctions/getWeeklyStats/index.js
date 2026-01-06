@@ -2,37 +2,53 @@
 
 const auth = require('auth')
 
+/**
+ * 获取某一年 ISO week 的最大周数（52 或 53）
+ * 规则：12 月 28 日一定属于该年的最后一个 ISO 周
+ */
+function getISOWeeksInYear(year) {
+  const d = new Date(Date.UTC(year, 11, 28))
+  const day = d.getUTCDay() || 7
+  d.setUTCDate(d.getUTCDate() + 4 - day)
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7)
+}
+
+/**
+ * 往前推 n 周，生成 [{ year, week }]
+ */
+function getLastNWeeks(year, week, n) {
+  const res = []
+  let y = year
+  let w = week
+
+  for (let i = 0; i < n; i++) {
+    res.unshift({ year: y, week: w })
+
+    w--
+    if (w === 0) {
+      y--
+      w = getISOWeeksInYear(y)
+    }
+  }
+  return res
+}
+
 exports.main = async (event, context) => {
   const db = uniCloud.database()
   const $ = db.command.aggregate
   const { uid } = await auth(context)
 
-  // =====================
-  // 1. 计算最近 11 周时间范围
-  // =====================
   const WEEKS = 11
-  const DAYS = WEEKS * 7
-
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const startDate = new Date(today)
-  startDate.setDate(today.getDate() - DAYS + 1)
-
-  const startStr = startDate.toISOString().slice(0, 10)
-  const endStr = today.toISOString().slice(0, 10)
 
   // =====================
-  // 2. DB 内：date 范围筛选 + 按周聚合
+  // 1. DB 聚合（完全相信 year / yearWeek）
   // =====================
-  const aggRes = await db.collection('training_record')
+  const aggRes = await db
+    .collection('training_record')
     .aggregate()
     .match({
-      user_id: uid,
-      $and: [
-        { date: $.gte(startStr) },
-        { date: $.lte(endStr) }
-      ]
+      user_id: uid
     })
     .group({
       _id: {
@@ -49,8 +65,21 @@ exports.main = async (event, context) => {
     })
     .end()
 
+  if (!aggRes.data.length) {
+    return {
+      code: 200,
+      data: {
+        categories: [],
+        loadData: [],
+        avgRpeData: [],
+        acwrCoupled: [],
+        acwrUncoupled: []
+      }
+    }
+  }
+
   // =====================
-  // 3. 转成 week map
+  // 2. 转成 weekMap
   // =====================
   const weeklyMap = {}
   aggRes.data.forEach(item => {
@@ -64,36 +93,27 @@ exports.main = async (event, context) => {
   })
 
   // =====================
-  // 4. 补全最近 11 周（防断周）
+  // 3. 取“最新一周”作为锚点
   // =====================
-  const weeklyStats = []
-  const cursor = new Date(startDate)
+  const last = aggRes.data[aggRes.data.length - 1]
+  const lastYear = last._id.year
+  const lastWeek = last._id.week
 
-  while (weeklyStats.length < WEEKS) {
-    const temp = new Date(cursor)
-    temp.setDate(temp.getDate() + 6)
+  const weekList = getLastNWeeks(lastYear, lastWeek, WEEKS)
 
-    const year = temp.getFullYear()
-
-    // ISO week 计算（不依赖 utils）
-    const firstThursday = new Date(year, 0, 4)
-    const week =
-      Math.ceil(
-        ((temp - firstThursday) / 86400000 +
-          firstThursday.getDay() + 1) / 7
-      )
-
+  // =====================
+  // 4. 补全最近 11 周（零 Date 参与）
+  // =====================
+  const weeklyStats = weekList.map(({ year, week }) => {
     const key = `${year}-${week}`
     const data = weeklyMap[key]
 
-    weeklyStats.push({
+    return {
       label: `CW${week}`,
       totalLoad: data ? data.totalLoad : 0,
       avgRpe: data ? data.avgRpe : 0
-    })
-
-    cursor.setDate(cursor.getDate() + 7)
-  }
+    }
+  })
 
   // =====================
   // 5. 计算 ACWR
